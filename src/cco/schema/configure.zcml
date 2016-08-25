@@ -6,27 +6,17 @@
   
   <i18n:registerTranslations directory="locales" />
 
-  <!-- authentication -->
+  <zope:adapter factory="cco.schema.base.SchemaController"
+                provides="cco.schema.interfaces.ISchemaController"
+                trusted="True" />
 
-  <!--<zope:adapter
-        name="auth"
-        for="* zope.publisher.interfaces.IRequest"
-        provides="zope.traversing.interfaces.ITraversable"
-        factory="cco.member.auth.AuthURLNameSpace" />-->
+  <zope:class class="cco.schema.base.SchemaController">
+    <require permission="zope.View"
+             interface="cco.schema.interfaces.ISchemaController" />
+    <require permission="zope.ManageContent"
+             set_schema="cco.schema.interfaces.ISchemaController" />
+  </zope:class>
 
-  <!-- views -->
-
-  <!--<browser:page for="loops.interfaces.INode"
-        name="login.html"
-        class="cco.member.browser.LoginForm"
-        permission="zope.View" />
-
-  <zope:adapter
-      name="login.html"
-      for="loops.interfaces.IConcept
-           zope.publisher.interfaces.browser.IBrowserRequest"
-      provides="zope.interface.Interface"
-      factory="cco.member.browser.LoginConcept"
-      permission="zope.View" />-->
+  <zope:adapter factory="cco.schema.processor.SchemaProcessor" />
 
 </configure>

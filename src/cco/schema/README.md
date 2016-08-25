@@ -1,6 +1,6 @@
 
-cco.schema - cyberconcepts.org: controlling schema/form appearance via data tables
-==================================================================================
+cco.schema - cyberconcepts.org: controlling schema/form appearance
+==================================================================
 
   >>> from zope.publisher.browser import TestRequest
   >>> from logging import getLogger
@@ -10,9 +10,12 @@ cco.schema - cyberconcepts.org: controlling schema/form appearance via data tabl
   >>> from loops.concept import Concept
   >>> from loops.common import adapted
 
+  >>> from loops.knowledge.tests import importData
+  >>> importData(loopsRoot)
+
   >>> concepts = loopsRoot['concepts']
   >>> len(list(concepts.keys()))
-  10
+  23
 
   >>> from loops.browser.node import NodeView
   >>> home = loopsRoot['views']['home']

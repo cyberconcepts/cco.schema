@@ -24,7 +24,8 @@ from zope.i18nmessageid import MessageFactory
 from zope.interface import Interface
 from zope import schema
 
-from cybertools.composer.schema.grid.interfaces import KeyTable
+from cybertools.composer.schema.grid.interfaces import Records
+from loops.util import KeywordVocabulary
 
 
 _ = MessageFactory('cco.schema')
@@ -32,7 +33,25 @@ _ = MessageFactory('cco.schema')
 
 class ISchemaController(Interface):
 
-    schemaData = KeyTable(title=_(u'Schema Data'),
+    schemaData = Records(
+        title=_(u'Schema Data'),
         description=_(u'Schema Data'),
+        default=[],
         required=False)
 
+    schemaData.column_types = [
+            schema.Text(__name__='fieldName', title=_(u'Field Name')),
+            schema.Text(__name__='help_reference', title=_(u'Help Reference')),
+            schema.Choice(__name__='required', title=_(u'required'),
+                source=KeywordVocabulary((
+                    ('required', _(u'required')),
+                    ('optional', _(u'optional')),))),
+            schema.Choice(__name__='editable', title=_(u'editable'),
+                source=KeywordVocabulary((
+                    ('editable', _(u'editable')),
+                    ('hidden', _(u'hidden')),))),
+            schema.Choice(__name__='display', title=_(u'display'),
+                source=KeywordVocabulary((
+                    ('visible', _(u'visible')),
+                    ('hidden', _(u'hidden')),))),
+    ]

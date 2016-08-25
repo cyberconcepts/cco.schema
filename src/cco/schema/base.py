@@ -17,7 +17,7 @@
 #
 
 """
-Schema stuff.
+A concept adapter to be used as a schema controller.
 """
 
 from zope.app.pagetemplate import ViewPageTemplateFile
@@ -33,7 +33,8 @@ from cybertools.composer.schema.browser.form import Form
 from cybertools.composer.schema.schema import FormState, FormError
 from loops.browser.concept import ConceptView
 from loops.browser.node import NodeView, getViewConfiguration
-from loops.common import adapted
+from loops.common import AdapterBase
+from loops.interfaces import IConcept
 
 
 _ = MessageFactory('cco.schema')
@@ -41,8 +42,10 @@ _ = MessageFactory('cco.schema')
 #template = ViewPageTemplateFile('auth.pt')
 
 
-class SchemaController(object):
+class SchemaController(AdapterBase):
 
     implements(ISchemaController)
 
-    columnNames = ('fieldName', 'required',)
+    _contextAttributes = AdapterBase._contextAttributes + list(ISchemaController)
+
+    #schemaData = []

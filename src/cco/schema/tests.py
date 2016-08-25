@@ -11,7 +11,9 @@ from zope.app.testing.setup import placefulSetUp, placefulTearDown
 from zope.publisher.browser import TestRequest
 from zope.testing.doctestunit import DocFileSuite
 
-from loops.interfaces import IConceptManager
+from cco.schema.base import SchemaController
+from cco.schema.interfaces import ISchemaController
+from loops.setup import importData as baseImportData
 from loops.tests.setup import TestSite
 
 
@@ -25,6 +27,13 @@ def setUp(self):
 
 def tearDown(self):
     placefulTearDown()
+
+
+importPath = os.path.join(os.path.dirname(__file__), 'data')
+
+def importData(loopsRoot):
+    component.provideAdapter(SchemaController, provides=ISchemaController)
+    baseImportData(loopsRoot, importPath, 'cco_schema_en.dmp')
 
 
 class Test(unittest.TestCase):
