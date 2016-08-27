@@ -13,6 +13,7 @@ from zope.testing.doctestunit import DocFileSuite
 
 from cco.schema.base import SchemaController
 from cco.schema.interfaces import ISchemaController
+from cco.schema.processor import SchemaProcessor
 from loops.setup import importData as baseImportData
 from loops.tests.setup import TestSite
 
@@ -32,7 +33,8 @@ def tearDown(self):
 importPath = os.path.join(os.path.dirname(__file__), 'data')
 
 def importData(loopsRoot):
-    component.provideAdapter(SchemaController, provides=ISchemaController)
+    component.provideAdapter(SchemaController)
+    component.provideAdapter(SchemaProcessor)
     baseImportData(loopsRoot, importPath, 'cco_schema_en.dmp')
 
 

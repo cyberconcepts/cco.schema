@@ -24,6 +24,7 @@ from zope.component import adapts
 from zope.interface import implements
 
 from cybertools.composer.schema.interfaces import ISchemaFactory, ISchemaProcessor
+from loops.common import baseObject
 
 
 class SchemaProcessor(object):
@@ -31,10 +32,27 @@ class SchemaProcessor(object):
     implements(ISchemaProcessor)
     adapts(ISchemaFactory)
 
-    def __init__(self, context):
-        self.context = context
-        #print '***', context.context
+    view = None
 
-    def process(self, field):
-        #print '***', field.name
-        return field
+    def __init__(self, context):
+        self.schemaFactory = context
+        self.adapted = context.context
+        #print '**1', self.adapted
+
+    def setup(self, view, **kw):
+        self.view = view
+        #print '**2', kw, self.view.request.form
+        typeToken = getattr(self.view, 'typeToken', None)
+        if typeToken is None:
+            self.type = baseObject(self.adapted).conceptType
+        else:
+            self.type = self.view.loopsRoot.loopsTraverse(typeToken)
+        #print '***', self.type.__name__
+
+    def process(self, field, **kw):
+        if self.view is None:
+            view = kw.pop('manager')
+            if view is not None:
+                self.setup(view, **kw)
+        print '**3', field.name
+        #return field
