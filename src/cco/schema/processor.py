@@ -54,5 +54,5 @@ class SchemaProcessor(object):
             view = kw.pop('manager')
             if view is not None:
                 self.setup(view, **kw)
-        print '**3', field.name
-        #return field
+        #print '**3', field.name
+        return field
