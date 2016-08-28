@@ -44,7 +44,7 @@ class SchemaProcessor(object):
         #print '**2', kw, self.view.request.form
         typeToken = getattr(self.view, 'typeToken', None)
         if typeToken is None:
-            self.type = baseObject(self.adapted).conceptType
+            self.type = baseObject(self.adapted).getType()
         else:
             self.type = self.view.loopsRoot.loopsTraverse(typeToken)
         #print '***', self.type.__name__
