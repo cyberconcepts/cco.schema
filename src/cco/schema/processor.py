@@ -20,10 +20,12 @@
 Schema processor.
 """
 
+from logging import getLogger
 from zope.component import adapts
 from zope.interface import implements
 
 from cybertools.composer.schema.interfaces import ISchemaFactory, ISchemaProcessor
+from loops.browser.common import BaseView
 from loops.common import baseObject
 
 
@@ -32,27 +34,44 @@ class SchemaProcessor(object):
     implements(ISchemaProcessor)
     adapts(ISchemaFactory)
 
+    logger = getLogger('cco.schema.SchemaProcessor')
     view = None
 
     def __init__(self, context):
         self.schemaFactory = context
         self.adapted = context.context
-        #print '**1', self.adapted
 
     def setup(self, view, **kw):
         self.view = view
-        #print '**2', kw, self.view.request.form
+        self.schemaControllers = []
         typeToken = getattr(self.view, 'typeToken', None)
         if typeToken is None:
             self.type = baseObject(self.adapted).getType()
         else:
-            self.type = self.view.loopsRoot.loopsTraverse(typeToken)
-        #print '***', self.type.__name__
+            self.type = view.loopsRoot.loopsTraverse(typeToken)
+        opts = view.typeOptions('schema_controller')
+        if opts:
+            for opt in opts:
+                data = opt.split('.')
+                sctype = self.scsetup[data[0]]
+                params = data[1:]
+                sctype(self, params)
+
+    def setupParentBasedSchemaController(self, params):
+        msg = 'parent based: %s' % params
+        self.logger.info(msg)
+
+    def setupTypeBasedSchemaController(self, params):
+        msg = 'type based: %s' % params
+        self.logger.info(msg)
+
+    scsetup = dict(parent=setupParentBasedSchemaController,
+                   type=setupTypeBasedSchemaController)
 
     def process(self, field, **kw):
         if self.view is None:
             view = kw.pop('manager')
-            if view is not None:
+            if isinstance(view, BaseView):
                 self.setup(view, **kw)
         #print '**3', field.name
         return field
