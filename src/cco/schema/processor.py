@@ -23,10 +23,12 @@ Schema processor.
 from logging import getLogger
 from zope.component import adapts
 from zope.interface import implements
+from zope.traversing.api import getName
 
+from cco.schema.interfaces import ISchemaController
 from cybertools.composer.schema.interfaces import ISchemaFactory, ISchemaProcessor
 from loops.browser.common import BaseView
-from loops.common import baseObject
+from loops.common import adapted, baseObject
 
 
 class SchemaProcessor(object):
@@ -40,6 +42,7 @@ class SchemaProcessor(object):
     def __init__(self, context):
         self.schemaFactory = context
         self.adapted = context.context
+        self.schemaData = {}
 
     def setup(self, view, **kw):
         self.view = view
@@ -53,17 +56,42 @@ class SchemaProcessor(object):
         if opts:
             for opt in opts:
                 data = opt.split('.')
-                sctype = self.scsetup[data[0]]
+                if data[0] not in self.scsetup:
+                    self.logger.warn('unknown schema controller: %s.' % data[0])
+                    return
+                setupSctype = self.scsetup[data[0]]
                 params = data[1:]
-                sctype(self, params)
+                setupSctype(self, params)
 
     def setupParentBasedSchemaController(self, params):
-        msg = 'parent based: %s' % params
-        self.logger.info(msg)
+        self.logger.info('parent based, params: %s.' % params)
 
     def setupTypeBasedSchemaController(self, params):
-        msg = 'type based: %s' % params
-        self.logger.info(msg)
+        self.logger.info('type based, params: %s.' % params)
+        predicateName = 'use_schema'
+        if params:
+            predicateName = params[0]
+        predicate = self.view.conceptManager.get(predicateName)
+        if predicate is None:
+            self.logger.warn('predicate %s not found.' % predicateName)
+            return
+        for c in self.type.getParents([predicate]):
+            adp = adapted(c)
+            if not ISchemaController.providedBy(adp):
+                self.logger.warn('no valid schema controller: %s.' % getName(c))
+                return
+            sc = adp.schemaData
+            for row in sc:
+                row = dict(row)     # copy to avoid changing original data
+                key = row.pop('fieldName', None)
+                if not key:
+                    self.logger.warn('empty field name in schema controller: %s.'
+                                     % getName(c))
+                    continue
+                if key in self.schemaData:
+                    self.logger.warn('duplicate field name: %s.' % key)
+                else:
+                    self.schemaData[key] = row
 
     scsetup = dict(parent=setupParentBasedSchemaController,
                    type=setupTypeBasedSchemaController)
@@ -74,4 +102,23 @@ class SchemaProcessor(object):
             if isinstance(view, BaseView):
                 self.setup(view, **kw)
         #print '**3', field.name
+        cinfo = self.schemaData.get(field.name)
+        if cinfo is not None:
+            #print '***', field.name, cinfo
+            self.processRequired(field, cinfo.get('required'))
+            self.processEditable(field, cinfo.get('editable'))
+            self.processDisplay(field, cinfo.get('display'))
         return field
+
+    def processRequired(self, field, setting):
+        if setting:
+            field.required = ((setting == 'required') or False)
+
+    def processEditable(self, field, setting):
+        if setting:
+            field.readonly = ((setting == 'hidden') or False)
+
+    def processDisplay(self, field, setting):
+        if setting:
+            field.visible = ((setting == 'visible') or False)
+
