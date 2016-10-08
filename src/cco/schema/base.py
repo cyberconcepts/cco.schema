@@ -20,26 +20,17 @@
 A concept adapter to be used as a schema controller.
 """
 
-from zope.app.pagetemplate import ViewPageTemplateFile
-from zope.cachedescriptors.property import Lazy
-from zope import component
-from zope.i18n import translate
 from zope.i18nmessageid import MessageFactory
 from zope.interface import implements
 
 from cco.schema.interfaces import ISchemaController
-from cybertools.composer.schema.browser.common import schema_macros
-from cybertools.composer.schema.browser.form import Form
-from cybertools.composer.schema.schema import FormState, FormError
-from loops.browser.concept import ConceptView
-from loops.browser.node import NodeView, getViewConfiguration
 from loops.common import AdapterBase
-from loops.interfaces import IConcept
+from loops.type import TypeInterfaceSourceList
 
 
 _ = MessageFactory('cco.schema')
 
-#template = ViewPageTemplateFile('auth.pt')
+TypeInterfaceSourceList.typeInterfaces += (ISchemaController,)
 
 
 class SchemaController(AdapterBase):

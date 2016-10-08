@@ -63,35 +63,69 @@ class SchemaProcessor(object):
                 params = data[1:]
                 setupSctype(self, params)
 
+    def setupSchemaData(self, sd):
+        for row in sd:
+            row = dict(row)     # copy to avoid changing original data
+            key = row.pop('fieldName', None)
+            if not key:
+                self.logger.warn('Empty field name in schema controller: %s.'
+                                 % getName(c))
+                continue
+            if key in self.schemaData:
+                self.logger.warn('Duplicate field name: %s.' % key)
+            else:
+                self.schemaData[key] = row
+
     def setupParentBasedSchemaController(self, params):
-        self.logger.info('parent based, params: %s.' % params)
+        self.logger.info('Parent-based, params: %s.' % params)
+        if len(params) < 2:
+            self.logger.warn(
+                'Parent-based schema controller needs at least 2 parameters. '
+                'Given: %s' % params)
+            return
+        predName = params[0]
+        typeName = params[1]
+        recursive = 'recursive' in params[2:] or False
+        predicate = self.view.conceptManager.get(predName)
+        if predicate is None:
+            self.logger.warn('Predicate %s not found.' % predicateName)
+            return
+        type = self.view.conceptManager.get(typeName)
+        if type is None:
+            self.logger.warn('Type %s not found.' % typeName)
+            return
+        self.setupParents(baseObject(self.adapted), predicate, type, recursive)
+
+    def setupParents(self, obj, predicate, type, recursive):
+        for c in obj.getParents([predicate]):
+            if c.conceptType != type:
+                continue
+            adp = adapted(c)
+            if not ISchemaController.providedBy(adp):
+                self.logger.warn('No valid schema controller: %s.' % getName(c))
+                continue
+            sd = adp.schemaData
+            if sd:
+                self.logger.info('Using schema controller %s.' % getName(c))
+                self.setupSchemaData(sd)
+            if recursive:
+                self.setupParents(c, predicate, type, recursive)
 
     def setupTypeBasedSchemaController(self, params):
-        self.logger.info('type based, params: %s.' % params)
-        predicateName = 'use_schema'
+        self.logger.info('Type-based, params: %s.' % params)
+        predName = 'use_schema'
         if params:
-            predicateName = params[0]
-        predicate = self.view.conceptManager.get(predicateName)
+            predName = params[0]
+        predicate = self.view.conceptManager.get(predName)
         if predicate is None:
-            self.logger.warn('predicate %s not found.' % predicateName)
+            self.logger.warn('Predicate %s not found.' % predicateName)
             return
         for c in self.type.getParents([predicate]):
             adp = adapted(c)
             if not ISchemaController.providedBy(adp):
-                self.logger.warn('no valid schema controller: %s.' % getName(c))
+                self.logger.warn('No valid schema controller: %s.' % getName(c))
                 return
-            sc = adp.schemaData
-            for row in sc:
-                row = dict(row)     # copy to avoid changing original data
-                key = row.pop('fieldName', None)
-                if not key:
-                    self.logger.warn('empty field name in schema controller: %s.'
-                                     % getName(c))
-                    continue
-                if key in self.schemaData:
-                    self.logger.warn('duplicate field name: %s.' % key)
-                else:
-                    self.schemaData[key] = row
+            self.setupSchemaData(adp.schemaData)
 
     scsetup = dict(parent=setupParentBasedSchemaController,
                    type=setupTypeBasedSchemaController)
@@ -101,7 +135,6 @@ class SchemaProcessor(object):
             view = kw.pop('manager')
             if isinstance(view, BaseView):
                 self.setup(view, **kw)
-        #print '**3', field.name
         cinfo = self.schemaData.get(field.name)
         if cinfo is not None:
             #print '***', field.name, cinfo
@@ -112,13 +145,13 @@ class SchemaProcessor(object):
 
     def processRequired(self, field, setting):
         if setting:
-            field.required = ((setting == 'required') or False)
+            field.required = (setting == 'required' or False)
 
     def processEditable(self, field, setting):
         if setting:
-            field.readonly = ((setting == 'hidden') or False)
+            field.readonly = (setting == 'hidden' or False)
 
     def processDisplay(self, field, setting):
         if setting:
-            field.visible = ((setting == 'visible') or False)
+            field.visible = (setting == 'visible' or False)
 
