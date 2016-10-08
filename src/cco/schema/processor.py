@@ -83,20 +83,28 @@ class SchemaProcessor(object):
                 'Parent-based schema controller needs at least 2 parameters. '
                 'Given: %s' % params)
             return
-        predName = params[0]
+        predNames = params[0].split('/')
         typeName = params[1]
         recursive = 'recursive' in params[2:] or False
-        predicate = self.view.conceptManager.get(predName)
+        predicate = self.view.conceptManager.get(predNames[0])
         if predicate is None:
-            self.logger.warn('Predicate %s not found.' % predicateName)
+            self.logger.warn('Predicate %s not found.' % predNames[0])
             return
         type = self.view.conceptManager.get(typeName)
         if type is None:
             self.logger.warn('Type %s not found.' % typeName)
             return
-        self.setupParents(baseObject(self.adapted), predicate, type, recursive)
+        uppreds = []
+        for pn in predNames[1:]:
+            uppred = self.view.conceptManager.get(pn)
+            if uppred is None:
+                self.logger.warn('Predicate %s not found.' % predNames[0])
+            else:
+                uppreds.append(uppred)
+        self.setupParents(baseObject(self.adapted), 
+                          predicate, type, recursive, uppreds=uppreds)
 
-    def setupParents(self, obj, predicate, type, recursive):
+    def setupParents(self, obj, predicate, type, recursive, uppreds=[]):
         for c in obj.getParents([predicate]):
             if c.conceptType != type:
                 continue
@@ -109,7 +117,10 @@ class SchemaProcessor(object):
                 self.logger.info('Using schema controller %s.' % getName(c))
                 self.setupSchemaData(sd)
             if recursive:
-                self.setupParents(c, predicate, type, recursive)
+                if uppreds:
+                    predicate = uppreds[0]
+                    uppreds = uppreds[1:]
+                self.setupParents(c, predicate, type, recursive, uppreds)
 
     def setupTypeBasedSchemaController(self, params):
         self.logger.info('Type-based, params: %s.' % params)
@@ -132,12 +143,13 @@ class SchemaProcessor(object):
 
     def process(self, field, **kw):
         if self.view is None:
-            view = kw.pop('manager')
+            view = kw.pop('manager', None)
             if isinstance(view, BaseView):
                 self.setup(view, **kw)
+            else:
+                return field
         cinfo = self.schemaData.get(field.name)
         if cinfo is not None:
-            #print '***', field.name, cinfo
             self.processRequired(field, cinfo.get('required'))
             self.processEditable(field, cinfo.get('editable'))
             self.processDisplay(field, cinfo.get('display'))
