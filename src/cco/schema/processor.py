@@ -87,7 +87,7 @@ class SchemaProcessor(object):
             return
         predNames = params[0].split('/')
         typeName = params[1]
-        recursive = 'recursive' in params[2:] or False
+        recursive = 'recursive' in params[2:]
         predicate = self.view.conceptManager.get(predNames[0])
         if predicate is None:
             self.logger.warn('Predicate %s not found.' % predNames[0])
@@ -159,13 +159,13 @@ class SchemaProcessor(object):
 
     def processRequired(self, field, setting):
         if setting:
-            field.required = (setting == 'required' or False)
+            field.required = setting == 'required'
 
     def processEditable(self, field, setting):
         if setting:
-            field.readonly = (setting == 'hidden' or False)
+            field.readonly = setting == 'hidden'
 
     def processDisplay(self, field, setting):
         if setting:
-            field.visible = (setting == 'visible' or False)
+            field.visible = setting == 'visible'
 
