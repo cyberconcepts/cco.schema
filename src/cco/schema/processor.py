@@ -77,6 +77,8 @@ class SchemaProcessor(object):
                 self.schemaData[key] = row
 
     def setupParentBasedSchemaController(self, params):
+        if self.adapted.__is_dummy__:
+            return      # there are no parents during object creation
         self.logger.info('Parent-based, params: %s.' % params)
         if len(params) < 2:
             self.logger.warn(
