@@ -121,8 +121,9 @@ class SchemaProcessor(object):
             if recursive:
                 if uppreds:
                     predicate = uppreds[0]
-                    uppreds = uppreds[1:]
-                self.setupParents(c, predicate, type, recursive, uppreds)
+                    self.setupParents(c, predicate, type, recursive, uppreds[1:])
+                else:
+                    self.setupParents(c, predicate, type, recursive)
 
     def setupTypeBasedSchemaController(self, params):
         self.logger.info('Type-based, params: %s.' % params)
