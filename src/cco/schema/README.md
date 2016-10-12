@@ -14,8 +14,6 @@ cco.schema - cyberconcepts.org: controlling schema/form appearance
   >>> importData(loopsRoot)
 
   >>> concepts = loopsRoot['concepts']
-  >>> len(list(concepts.keys()))
-  23
 
   >>> from loops.browser.node import NodeView
   >>> home = loopsRoot['views']['home']
@@ -28,3 +26,5 @@ Schema Controller
 ### Type-controlled schemas ###
 
   >>> from cco.schema.base import SchemaController
+
+  >>> from cco.schema.processor import SchemaProcessor

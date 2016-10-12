@@ -49,6 +49,9 @@ class SchemaProcessor(object):
         self.schemaControllers = []
         typeToken = getattr(self.view, 'typeToken', None)
         if typeToken is None:
+            if (self.adapted.__is_dummy__ or 
+                getName(baseObject(self.adapted)) is None):
+                return
             self.type = baseObject(self.adapted).getType()
         else:
             self.type = view.loopsRoot.loopsTraverse(typeToken)
