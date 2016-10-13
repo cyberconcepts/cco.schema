@@ -49,7 +49,7 @@ class SchemaProcessor(object):
         self.schemaControllers = []
         typeToken = getattr(self.view, 'typeToken', None)
         if typeToken is None:
-            if (self.adapted.__is_dummy__ or 
+            if (getattr(self.adapted, '__is_dummy__', True) or 
                 getName(baseObject(self.adapted)) is None):
                 return
             self.type = baseObject(self.adapted).getType()
