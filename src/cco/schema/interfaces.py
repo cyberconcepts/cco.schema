@@ -33,11 +33,20 @@ _ = MessageFactory('cco.schema')
 
 class ISchemaController(Interface):
 
+    scInterface = schema.Choice(
+        title=_(u'Schema Controller Interface'),
+        description=_(u'The interface this schema controller is used for.'),
+        default=None,
+        source='loops.TypeInterfaceSource',
+        required=False)
+
     schemaData = Records(
         title=_(u'Schema Data'),
         description=_(u'Schema Data'),
         default=[],
         required=False)
+
+    scInterface.hidden = True
 
     schemaData.column_types = [
             schema.Text(__name__='fieldName', title=_(u'Field Name')),
