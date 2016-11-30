@@ -46,7 +46,7 @@ class ISchemaController(Interface):
         default=[],
         required=False)
 
-    scInterface.hidden = True
+    scInterface.suppress = True
 
     schemaData.column_types = [
             schema.Text(__name__='fieldName', title=_(u'Field Name')),
