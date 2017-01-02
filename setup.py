@@ -1,18 +1,9 @@
 from setuptools import setup, find_packages
 import os
 
-version = '1.0'
+version = '1.0.1'
 
-long_description = (
-    open('README.md').read()
-    + '\n' +
-    'Contributors\n'
-    '============\n'
-    + '\n' +
-    open('CONTRIBUTORS.txt').read()
-    + '\n' +
-    open('CHANGES.txt').read()
-    + '\n')
+long_description = open('README.md').read()
 
 setup(name='cco.schema',
       version=version,
@@ -27,7 +18,7 @@ setup(name='cco.schema',
       author='cyberconcepts.org team',
       author_email='team@cyberconcepts.org',
       url='http://www.cyberconcepts.org',
-      license='gpl',
+      license='GPL',
       packages=find_packages('src'),
       package_dir = {'': 'src'},
       namespace_packages=['cco'],
@@ -35,6 +26,7 @@ setup(name='cco.schema',
       zip_safe=False,
       install_requires=[
           'setuptools',
+          'loops',
           # -*- Extra requirements: -*-
       ],
       entry_points="""
