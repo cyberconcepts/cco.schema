@@ -16,6 +16,8 @@
              set_schema="cco.schema.interfaces.ISchemaController" />
   </zope:class>
 
-  <zope:adapter factory="cco.schema.processor.SchemaProcessor" />
+  <!--<zope:adapter factory="cco.schema.processor.SchemaProcessor" />-->
+  <!--has to be declared separately to be able to use an 
+      application-specific subclass -->
 
 </configure>
