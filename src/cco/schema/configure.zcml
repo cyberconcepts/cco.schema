@@ -17,7 +17,9 @@
   </zope:class>
 
   <!--<zope:adapter factory="cco.schema.processor.SchemaProcessor" />-->
-  <!--has to be declared separately to be able to use an 
-      application-specific subclass -->
+  <!--has to be declared separately (e.g. in application's ZCML)
+      to be able to use an application-specific subclass -->
+  <!-- example (e.g. in .../src/main/configure.zcml): 
+  <include package="cco.schema" file="schemaprocessor.zcml" />-->
 
 </configure>
