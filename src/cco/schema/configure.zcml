@@ -22,4 +22,9 @@
   <!-- example (e.g. in .../src/main/configure.zcml): 
   <include package="cco.schema" file="schemaprocessor.zcml" />-->
 
+  <!-- field definitions -->
+
+    <zope:adapter factory="cco.schema.field.UrlFieldInstance"
+                  name="url" />
+
 </configure>
