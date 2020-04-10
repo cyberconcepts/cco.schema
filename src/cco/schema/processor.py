@@ -82,7 +82,7 @@ class SchemaProcessor(object):
     def setupParentBasedSchemaController(self, params):
         if self.adapted.__is_dummy__:
             return      # there are no parents during object creation
-        self.logger.info('Parent-based, params: %s.' % params)
+        self.logger.debug('Parent-based, params: %s.' % params)
         if len(params) < 2:
             self.logger.warn(
                 'Parent-based schema controller needs at least 2 parameters. '
@@ -119,7 +119,7 @@ class SchemaProcessor(object):
                 continue
             sd = adp.schemaData
             if sd:
-                self.logger.info('Using schema controller %s.' % getName(c))
+                self.logger.debug('Using schema controller %s.' % getName(c))
                 self.setupSchemaData(sd)
             if recursive:
                 if uppreds:
@@ -129,7 +129,7 @@ class SchemaProcessor(object):
                     self.setupParents(c, predicate, type, recursive)
 
     def setupTypeBasedSchemaController(self, params):
-        self.logger.info('Type-based, params: %s.' % params)
+        self.logger.debug('Type-based, params: %s.' % params)
         predName = 'use_schema'
         if params:
             predName = params[0]
